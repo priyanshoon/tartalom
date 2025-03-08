@@ -21,19 +21,19 @@ type GoogleUserInfo struct {
 }
 
 func LoginWithGoole(c *fiber.Ctx) error {
-	url := config.GoogleConfig().AuthCodeURL("")
+	url := config.GoogleOauthConfig().AuthCodeURL("")
 	return c.Status(http.StatusTemporaryRedirect).Redirect(url)
 }
 
 func LoginWithGooleCallback(c *fiber.Ctx) error {
 	code := c.Query("code")
 
-	tok, err := config.GoogleConfig().Exchange(c.Context(), code)
+	tok, err := config.GoogleOauthConfig().Exchange(c.Context(), code)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	client := config.GoogleConfig().Client(c.Context(), tok)
+	client := config.GoogleOauthConfig().Client(c.Context(), tok)
 
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v1/userinfo")
 	if err != nil {
@@ -70,4 +70,8 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 	}
 
 	return c.Status(http.StatusAccepted).JSON(userInfo)
+}
+
+func LoginWithPassword(c *fiber.Ctx) error {
+	return c.SendString("Login with password")
 }
