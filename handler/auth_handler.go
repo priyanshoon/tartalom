@@ -31,6 +31,7 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 	tok, err := config.GoogleOauthConfig().Exchange(c.Context(), code)
 	if err != nil {
 		log.Fatal(err)
+		return c.Status(500).SendString("Lund lele mera!!!")
 	}
 
 	client := config.GoogleOauthConfig().Client(c.Context(), tok)
