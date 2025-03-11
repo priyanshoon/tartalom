@@ -10,6 +10,7 @@ import (
 	"tartalom/model"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type GoogleUserInfo struct {
@@ -57,12 +58,16 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 
 	db := database.DB
 
+	// TODO: Check User exist or not
+
 	user := model.User{
-		ID:       userInfo.ID,
-		Name:     userInfo.Name,
-		Email:    userInfo.Email,
-		Password: "",
-		Role:     "User",
+		ID:         uuid.New(),
+		GoogleID:   userInfo.ID,
+		Name:       userInfo.Name,
+		Email:      userInfo.Email,
+		Password:   "",
+		Role:       "User",
+		ProfilePic: userInfo.Picture,
 	}
 
 	if err := db.Create(&user).Error; err != nil {
