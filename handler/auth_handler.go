@@ -31,7 +31,7 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 
 	tok, err := config.GoogleOauthConfig().Exchange(c.Context(), code)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		return c.Status(500).SendString("Lund lele mera!!!")
 	}
 
@@ -59,6 +59,11 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 	db := database.DB
 
 	// TODO: Check User exist or not
+	userExist := db.Where("google_id = ?", userInfo.ID).First(&model.User{})
+
+	if userExist.RowsAffected == 1 {
+		return c.Status(404).SendString("User Exist")
+	}
 
 	user := model.User{
 		ID:         uuid.New(),
