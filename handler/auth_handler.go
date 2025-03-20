@@ -8,6 +8,7 @@ import (
 	"tartalom/config"
 	"tartalom/database"
 	"tartalom/model"
+	"tartalom/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -58,11 +59,15 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 
 	db := database.DB
 
-	// TODO: Check User exist or not
 	userExist := db.Where("google_id = ?", userInfo.ID).First(&model.User{})
 
 	if userExist.RowsAffected == 1 {
 		return c.Status(404).SendString("User Exist")
+	}
+
+	password, err := utils.PasswordGenerator()
+	if err != nil {
+		log.Println("The password failed to generate")
 	}
 
 	user := model.User{
@@ -70,7 +75,7 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 		GoogleID:   userInfo.ID,
 		Name:       userInfo.Name,
 		Email:      userInfo.Email,
-		Password:   "",
+		Password:   password,
 		Role:       "User",
 		ProfilePic: userInfo.Picture,
 	}
@@ -83,6 +88,35 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 	return c.Status(http.StatusAccepted).JSON(userInfo)
 }
 
-func LoginWithPassword(c *fiber.Ctx) error {
-	return c.SendString("Login with password")
-}
+// func RegisterWithPassword(c *fiber.Ctx) error {
+// 	user := new(model.User)
+//
+// 	if err := c.BodyParser(user); err != nil {
+// 		return err
+// 	}
+//
+// 	db := database.DB
+//
+// 	// TODO: Check user exist or not
+// 	userExist := db.Where("email = ?", user.Email).First(&model.User{})
+//
+// 	if userExist.RowsAffected == 1 {
+// 		return c.Status(302).SendString("User Exist")
+// 	}
+//
+// 	postUser := model.User{
+// 		ID:       uuid.New(),
+// 		GoogleID: "",
+// 		Name:     user.Name,
+// 		Email:    user.Email,
+// 		Password: user.Password,
+// 		Role:     "User",
+// 	}
+//
+// 	if err := db.Create(&postUser).Error; err != nil {
+// 		log.Printf("Error inserting user into the database: %v", err)
+// 		return c.Status(http.StatusInternalServerError).SendString("Error inserting user into the database.")
+// 	}
+//
+// 	return c.SendString("Login with password")
+// }
