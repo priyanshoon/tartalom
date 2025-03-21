@@ -31,3 +31,7 @@ func GoogleOauthConfig() *oauth2.Config {
 		Endpoint: google.Endpoint,
 	}
 }
+
+func GetJWTSecret() string {
+	return Config("JWT_SECRET")
+}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"tartalom/config"
 	"tartalom/database"
@@ -11,6 +12,7 @@ import (
 	"tartalom/utils"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -85,7 +87,31 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).SendString("Error inserting user into the database.")
 	}
 
-	return c.Status(http.StatusAccepted).JSON(userInfo)
+	// generate jwt token
+	jwtSecret := config.GetJWTSecret()
+	if jwtSecret == "" {
+		log.Println("JWT Secret not set.")
+		return c.Status(fiber.StatusInternalServerError).SendString("Server configuration error.")
+	}
+
+	claims := jwt.MapClaims{
+		"user_id": user.ID.String(),
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte(jwtSecret))
+	if err != nil {
+		log.Printf("error signing token : %v", err)
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal server error: error generating tokens")
+	}
+
+	response := fiber.Map{
+		"token": signedToken,
+		"user":  userInfo,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 // func RegisterWithPassword(c *fiber.Ctx) error {
