@@ -26,13 +26,7 @@ Tartalom is a simple headless content management system (CMS) built with Go (Gol
    cd tartalom
    ```
 
-2. **Switch to the development branch**:
-
-   ```bash
-   git checkout dev
-   ```
-
-3. **Set up environment variables**:
+2. **Set up environment variables**:
 
    Create a `.env` file in the root directory and add the following variables:
 
@@ -47,13 +41,13 @@ Tartalom is a simple headless content management system (CMS) built with Go (Gol
    DATABASE_NAME=tartalom_db
    ```
 
-4. **Install dependencies**:
+3. **Install dependencies**:
 
    ```bash
    go mod tidy
    ```
 
-5. **Run the application**:
+4. **Run the application**:
 
    ```bash
    go run cmd/api/main.go
