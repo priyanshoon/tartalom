@@ -71,24 +71,24 @@ tartalom/
 ├── config/
 │   └── config.go            # Configuration handling
 ├── database/
-│   ├── connect.go        # Database connection setup
-│   └── database.go                # Database instance
+│   ├── connect.go           # Database connection setup
+│   └── database.go          # Database instance
 ├── handler/
-│   ├── auth_handler.go              # Authentication handlers
-│   ├── blog_handler.go              # Blog management handlers
-│   └── api.go
-|   └── user_handler.go
+│   ├── auth_handler.go      # Authentication handlers
+│   ├── blog_handler.go      # Blog management handlers
+│   ├── user_handler.go      # User handlers
+│   └── api.go               # API handler
 ├── middleware/
 │   └── auth.go              # Authentication middleware
 ├── model/
 │   ├── blog.go              # Blog model
 │   └── user.go              # User model
 ├── route/
-│   ├── auth_route.go              # Authentication routes
-│   ├── user_route.go              # User routes
-│   └── blog_route.go              # Blog routes
+│   ├── auth_route.go        # Authentication routes
+│   ├── user_route.go        # User routes
+│   └── blog_route.go        # Blog routes
 ├── utils/
-│   └── password_generator.go          # Utility functions
+│   └── password_generator.go# Utility functions
 ├── .env                     # Environment variables
 ├── .gitignore
 ├── go.mod
