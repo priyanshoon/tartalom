@@ -13,6 +13,7 @@ func main() {
 	app := fiber.New()
 
 	route.AuthRoutes(app)
+	route.UserRoute(app)
 
 	app.Listen(":6969")
 }
