@@ -62,10 +62,33 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 	db := database.DB
 
 	// TODO: Fix the existing user issue: if login then server should generate token and send token as in response.
-	userExist := db.Where("google_id = ?", userInfo.ID).First(&model.User{})
+	var userExist model.User
+	userFound := db.Where("google_id = ?", userInfo.ID).First(&userExist)
 
-	if userExist.RowsAffected == 1 {
-		return c.Status(404).SendString("User Exist")
+	if userFound.RowsAffected == 1 {
+		jwtSecret := config.GetJWTSecret()
+		if jwtSecret == "" {
+			log.Println("JWT Secret not set.")
+			return c.Status(fiber.StatusInternalServerError).SendString("Server configuration error.")
+		}
+
+		claims := jwt.MapClaims{
+			"user_id": userExist.ID.String(),
+			"exp":     time.Now().Add(time.Hour * 24).Unix(),
+		}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		signedToken, err := token.SignedString([]byte(jwtSecret))
+		if err != nil {
+			log.Printf("error signing token : %v", err)
+			return c.Status(fiber.StatusInternalServerError).SendString("Internal server error: error generating tokens")
+		}
+
+		response := fiber.Map{
+			"token": signedToken,
+		}
+
+		return c.Status(405).JSON(response)
 	}
 
 	password, err := utils.PasswordGenerator()
