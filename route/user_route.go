@@ -15,4 +15,4 @@ func UserRoute(app *fiber.App) {
 	user.Get("", handler.Hello)
 }
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDI2MzU0MDIsInVzZXJfaWQiOiJjNWZjY2FmYy1kNWNkLTQxZjYtYTBlMC04MTE5OTZhOTUxMmIifQ.piDXwE-db_d4Lb39MxYObyr-5SoRf5fsCzVKBStz8-I
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDMyMjcwMjUsInVzZXJfaWQiOiIwMzk0ZmFkOC1hZTlhLTQxOWMtOGYyOC0wNmNkY2ViZWIwNTIifQ.I8r9sIrzGx4UCVf0c-bH0zWMyfXlBep5JBTObr88yWM

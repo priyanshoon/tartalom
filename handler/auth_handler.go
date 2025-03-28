@@ -132,7 +132,6 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 
 	response := fiber.Map{
 		"token": signedToken,
-		"user":  userInfo,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
