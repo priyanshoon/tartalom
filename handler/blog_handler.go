@@ -33,7 +33,14 @@ func PostBlog(c *fiber.Ctx) error {
 
 // TODO: Get All Blogs
 func GetBlogs(c *fiber.Ctx) error {
-	return c.Status(200).SendString("Getting Blogs...")
+	db := database.DB
+
+	var blogs []model.Blog
+	db.Find(&blogs)
+
+	return c.Status(200).JSON(fiber.Map{
+		"data": blogs,
+	})
 }
 
 // TODO: Delete Blogs

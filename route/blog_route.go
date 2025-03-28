@@ -12,5 +12,7 @@ func BlogRoute(app *fiber.App) {
 	api := app.Group("/api", logger.New())
 
 	blog := api.Group("/user/blog", middleware.AuthMiddleware())
+
 	blog.Post("/", handler.PostBlog)
+	blog.Get("/", handler.GetBlogs)
 }
