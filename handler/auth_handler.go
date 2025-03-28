@@ -61,7 +61,7 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 
 	db := database.DB
 
-	// TODO: Fix the existing user issue: if login then server should generate token and send token as in response.
+	// FIX: Fix the existing user issue: if login then server should generate token and send token as in response.
 	var userExist model.User
 	userFound := db.Where("google_id = ?", userInfo.ID).First(&userExist)
 
