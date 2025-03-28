@@ -1,13 +1,37 @@
 package handler
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"time"
 
-// TODO: Post Blog
+	"tartalom/database"
+	"tartalom/model"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+)
+
+// FIX : Post Blog
 func PostBlog(c *fiber.Ctx) error {
-	return c.Status(201).SendString("Posting Blogs...")
+	// log.Println("Raw body:", string(c.Body()))
+	blog := new(model.Blog)
+
+	if err := c.BodyParser(blog); err != nil {
+		return c.Status(503).JSON(fiber.Map{
+			"error": "Error fetching data: " + err.Error(),
+		})
+	}
+
+	blog.Blog_ID = uuid.New()
+	blog.PublishedDate = time.Now()
+
+	db := database.DB
+
+	db.Create(&blog)
+
+	return c.Status(201).JSON(blog)
 }
 
-// TODO: Get Blogs
+// TODO: Get All Blogs
 func GetBlogs(c *fiber.Ctx) error {
 	return c.Status(200).SendString("Getting Blogs...")
 }
@@ -21,3 +45,5 @@ func DeleteBlog(c *fiber.Ctx) error {
 func UpdateBlog(c *fiber.Ctx) error {
 	return c.Status(204).SendString("Updating Blogs...")
 }
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDMyMzU4MTUsInVzZXJfaWQiOiI4MWZhYTUyNi02MmVkLTQyY2QtODBkMC1hYjQ2YWUyNzE4N2UifQ.5XH4WJKZW_XN624qjrH26C57XS2GeKBqUUskcEdn_N0

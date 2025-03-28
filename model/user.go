@@ -10,5 +10,5 @@ type User struct {
 	Password   string    `json:"password"`
 	Role       string    `json:"role"`
 	ProfilePic string    `gorm:"default:https://github.com/shadcn.png;" json:"profpic"`
-	Blog       []Blog
+	Blog       []Blog    `gorm:"foreignKey:UserID"`
 }
