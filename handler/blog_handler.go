@@ -45,7 +45,21 @@ func GetBlogs(c *fiber.Ctx) error {
 
 // TODO: Delete Blogs
 func DeleteBlog(c *fiber.Ctx) error {
-	return c.Status(200).SendString("Deleting Blogs...")
+	blog := new(model.Blog)
+
+	if err := c.BodyParser(blog); err != nil {
+		return c.Status(503).JSON(fiber.Map{
+			"error": "Error fetching data: " + err.Error(),
+		})
+	}
+
+	db := database.DB
+
+	db.Delete(&model.Blog{}, blog.Blog_ID)
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Blog Deleted Successfully",
+	})
 }
 
 // TODO: Update Blogs
