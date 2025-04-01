@@ -64,7 +64,36 @@ func DeleteBlog(c *fiber.Ctx) error {
 
 // TODO: Update Blogs
 func UpdateBlog(c *fiber.Ctx) error {
-	return c.Status(204).SendString("Updating Blogs...")
+	blog := new(model.Blog)
+
+	if err := c.BodyParser(blog); err != nil {
+		return c.Status(503).JSON(fiber.Map{
+			"error": "Error fetching data: " + err.Error(),
+		})
+	}
+
+	db := database.DB
+
+	result := db.Model(&model.Blog{}).Where("blog_id = ?", blog.Blog_ID).Updates(&model.Blog{
+		Title: blog.Title,
+		Body:  blog.Body,
+	})
+
+	if result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Internal Server error",
+		})
+	}
+
+	if result.RowsAffected == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "blog not found!",
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Blog Updated!",
+	})
 }
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDMyMzU4MTUsInVzZXJfaWQiOiI4MWZhYTUyNi02MmVkLTQyY2QtODBkMC1hYjQ2YWUyNzE4N2UifQ.5XH4WJKZW_XN624qjrH26C57XS2GeKBqUUskcEdn_N0
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDM1OTk1MTAsInVzZXJfaWQiOiI4MWZhYTUyNi02MmVkLTQyY2QtODBkMC1hYjQ2YWUyNzE4N2UifQ.0O6ZnaNsi3UBJSndoFVlAgUmq2kqTdzzqBx16uJ8AZc
