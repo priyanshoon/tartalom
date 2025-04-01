@@ -18,7 +18,7 @@ func Config(key string) string {
 	return os.Getenv(key)
 }
 
-func GoogleConfig() *oauth2.Config {
+func GoogleOauthConfig() *oauth2.Config {
 	return &oauth2.Config{
 		ClientID:     Config("GOOGLE_CLIENT_ID"),
 		ClientSecret: Config("GOOGLE_CLIENT_SECRET"),
@@ -30,4 +30,8 @@ func GoogleConfig() *oauth2.Config {
 		},
 		Endpoint: google.Endpoint,
 	}
+}
+
+func GetJWTSecret() string {
+	return Config("JWT_SECRET")
 }

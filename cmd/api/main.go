@@ -13,6 +13,8 @@ func main() {
 	app := fiber.New()
 
 	route.AuthRoutes(app)
+	route.UserRoute(app)
+	route.BlogRoute(app)
 
 	app.Listen(":6969")
 }
