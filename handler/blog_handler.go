@@ -31,7 +31,7 @@ func PostBlog(c *fiber.Ctx) error {
 	return c.Status(201).JSON(blog)
 }
 
-// TODO: Get All Blogs
+// FIX: Get All Blogs
 func GetBlogs(c *fiber.Ctx) error {
 	db := database.DB
 
@@ -43,7 +43,7 @@ func GetBlogs(c *fiber.Ctx) error {
 	})
 }
 
-// TODO: Delete Blogs
+// FIX: Delete Blogs
 func DeleteBlog(c *fiber.Ctx) error {
 	blog := new(model.Blog)
 
@@ -62,7 +62,7 @@ func DeleteBlog(c *fiber.Ctx) error {
 	})
 }
 
-// TODO: Update Blogs
+// FIX: Update Blogs
 func UpdateBlog(c *fiber.Ctx) error {
 	blog := new(model.Blog)
 
@@ -94,6 +94,11 @@ func UpdateBlog(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"message": "Blog Updated!",
 	})
+}
+
+// TODO: Get blog by ID (blog_id)
+func GetBlogById(c *fiber.Ctx) error {
+	return c.Status(200).JSON(fiber.Map{})
 }
 
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDM1OTk1MTAsInVzZXJfaWQiOiI4MWZhYTUyNi02MmVkLTQyY2QtODBkMC1hYjQ2YWUyNzE4N2UifQ.0O6ZnaNsi3UBJSndoFVlAgUmq2kqTdzzqBx16uJ8AZc

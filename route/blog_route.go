@@ -11,9 +11,13 @@ import (
 func BlogRoute(app *fiber.App) {
 	api := app.Group("/api", logger.New())
 
-	blog := api.Group("/user/blog", middleware.AuthMiddleware())
+	blog := api.Group("/:user_id/blogs", middleware.AuthMiddleware())
 
+	// get all blogs
 	blog.Get("/", handler.GetBlogs)
+
+	// get blog by blog_id
+
 	blog.Post("/", handler.PostBlog)
 	blog.Put("/", handler.UpdateBlog)
 	blog.Delete("/", handler.DeleteBlog)
