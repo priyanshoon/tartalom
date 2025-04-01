@@ -1,11 +1,6 @@
 # Tartalom
 
-<<<<<<< HEAD
-*Note: Development is going on 'dev' branch*
-
-=======
 Tartalom is a simple headless content management system (CMS) built with Go (Golang). It provides a backend system to manage content, focusing on simplicity and efficiency.
->>>>>>> dev
 
 ## Features
 
