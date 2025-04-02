@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
 
 	"tartalom/config"
 	"tartalom/database"
@@ -12,7 +11,6 @@ import (
 	"tartalom/utils"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -74,26 +72,13 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 	userFound := db.Where("google_id = ?", userInfo.ID).First(&userExist)
 
 	if userFound.RowsAffected == 1 {
-		jwtSecret := config.GetJWTSecret()
-		if jwtSecret == "" {
-			log.Println("JWT Secret not set.")
-			return c.Status(fiber.StatusInternalServerError).SendString("Server configuration error.")
-		}
-
-		claims := jwt.MapClaims{
-			"user_id": userExist.ID.String(),
-			"exp":     time.Now().Add(time.Hour * 24).Unix(),
-		}
-
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		signedToken, err := token.SignedString([]byte(jwtSecret))
+		token, err := utils.GenerateJWT(userExist)
 		if err != nil {
-			log.Printf("error signing token : %v", err)
 			return c.Status(fiber.StatusInternalServerError).SendString("Internal server error: error generating tokens")
 		}
 
 		response := fiber.Map{
-			"token": signedToken,
+			"token": token,
 		}
 
 		return c.Status(405).JSON(response)
@@ -119,27 +104,13 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).SendString("Error inserting user into the database.")
 	}
 
-	// generate jwt token
-	jwtSecret := config.GetJWTSecret()
-	if jwtSecret == "" {
-		log.Println("JWT Secret not set.")
-		return c.Status(fiber.StatusInternalServerError).SendString("Server configuration error.")
-	}
-
-	claims := jwt.MapClaims{
-		"user_id": user.ID.String(),
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(jwtSecret))
+	token, err := utils.GenerateJWT(user)
 	if err != nil {
-		log.Printf("error signing token : %v", err)
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal server error: error generating tokens")
 	}
 
 	response := fiber.Map{
-		"token": signedToken,
+		"token": token,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
