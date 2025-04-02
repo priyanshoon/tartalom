@@ -19,6 +19,6 @@ func BlogRoute(app *fiber.App) {
 	// get blog by blog_id
 
 	blog.Post("/", handler.PostBlog)
-	blog.Put("/", handler.UpdateBlog)
-	blog.Delete("/", handler.DeleteBlog)
+	blog.Put("/:blog_id", handler.UpdateBlog)
+	blog.Delete("/:blog_id", handler.DeleteBlog)
 }

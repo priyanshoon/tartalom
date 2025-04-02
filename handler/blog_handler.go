@@ -38,9 +38,7 @@ func GetBlogs(c *fiber.Ctx) error {
 	var blogs []model.Blog
 	db.Find(&blogs)
 
-	return c.Status(200).JSON(fiber.Map{
-		"data": blogs,
-	})
+	return c.Status(200).JSON(blogs)
 }
 
 // FIX: Delete Blogs
