@@ -81,7 +81,7 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 			"token": token,
 		}
 
-		return c.Status(405).JSON(response)
+		return c.Status(200).JSON(response)
 	}
 
 	password, err := utils.PasswordGenerator()
@@ -116,35 +116,39 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
-// func RegisterWithPassword(c *fiber.Ctx) error {
-// 	user := new(model.User)
-//
-// 	if err := c.BodyParser(user); err != nil {
-// 		return err
-// 	}
-//
-// 	db := database.DB
-//
-// 	// TODO: Check user exist or not
-// 	userExist := db.Where("email = ?", user.Email).First(&model.User{})
-//
-// 	if userExist.RowsAffected == 1 {
-// 		return c.Status(302).SendString("User Exist")
-// 	}
-//
-// 	postUser := model.User{
-// 		ID:       uuid.New(),
-// 		GoogleID: "",
-// 		Name:     user.Name,
-// 		Email:    user.Email,
-// 		Password: user.Password,
-// 		Role:     "User",
-// 	}
-//
-// 	if err := db.Create(&postUser).Error; err != nil {
-// 		log.Printf("Error inserting user into the database: %v", err)
-// 		return c.Status(http.StatusInternalServerError).SendString("Error inserting user into the database.")
-// 	}
-//
-// 	return c.SendString("Login with password")
-// }
+func RegisterWithPassword(c *fiber.Ctx) error {
+	user := new(model.User)
+
+	if err := c.BodyParser(user); err != nil {
+		return c.Status(503).JSON(fiber.Map{
+			"error": "Error fetching data: " + err.Error(),
+		})
+	}
+
+	db := database.DB
+
+	// TODO: Check user exist or not
+	userExist := db.Where("email = ?", user.Email).First(&model.User{})
+
+	if userExist.RowsAffected == 1 {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"error": "User already exist, go to login!",
+		})
+	}
+
+	createUser := model.User{
+		ID:       uuid.New(),
+		GoogleID: "",
+		Name:     user.Name,
+		Email:    user.Email,
+		Password: user.Password,
+		Role:     "User",
+	}
+
+	if err := db.Create(&createUser).Error; err != nil {
+		log.Printf("Error inserting user into the database: %v", err)
+		return c.Status(http.StatusInternalServerError).SendString("Error inserting user into the database.")
+	}
+
+	return c.SendString("Login with password")
+}
