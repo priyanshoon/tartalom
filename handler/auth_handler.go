@@ -25,12 +25,20 @@ type GoogleUserInfo struct {
 }
 
 func LoginWithGoole(c *fiber.Ctx) error {
-	url := config.GoogleOauthConfig().AuthCodeURL("")
+	state := utils.GenerateState()
+	url := config.GoogleOauthConfig().AuthCodeURL(state)
 	return c.Status(http.StatusTemporaryRedirect).Redirect(url)
 }
 
 func LoginWithGooleCallback(c *fiber.Ctx) error {
 	code := c.Query("code")
+	state := c.Query("state")
+
+	if code == "" || state == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Bad request",
+		})
+	}
 
 	tok, err := config.GoogleOauthConfig().Exchange(c.Context(), code)
 	if err != nil {
