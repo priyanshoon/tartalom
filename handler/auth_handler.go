@@ -186,10 +186,14 @@ func RegisterWithPassword(c *fiber.Ctx) error {
 
 	if err := db.Create(&createUser).Error; err != nil {
 		log.Printf("Error inserting user into the database: %v", err)
-		return c.Status(http.StatusInternalServerError).SendString("Error inserting user into the database.")
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "something went wrong",
+		})
 	}
 
-	return c.SendString("Login with password")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "user registered successfully",
+	})
 }
 
 // TODO: create handler for manual login for users
