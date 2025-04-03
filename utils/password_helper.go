@@ -4,6 +4,8 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+"
@@ -23,6 +25,13 @@ func PasswordGenerator() (string, error) {
 	return string(password), nil
 }
 
-func EncryptPassword() (string, error) {
-	return "", nil
+func EncryptPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	if err != nil {
+		return "", fmt.Errorf("error generating hash value of password : %v", err)
+	}
+
+	return string(hash), nil
 }
+
+func ValidatePassword() {}

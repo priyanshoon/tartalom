@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"regexp"
 
 	"tartalom/config"
 	"tartalom/database"
@@ -89,12 +90,19 @@ func LoginWithGooleCallback(c *fiber.Ctx) error {
 		log.Println("The password failed to generate")
 	}
 
+	hashPassword, err := utils.EncryptPassword(password)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Internal server error",
+		})
+	}
+
 	user := model.User{
 		ID:         uuid.New(),
 		GoogleID:   userInfo.ID,
 		Name:       userInfo.Name,
 		Email:      userInfo.Email,
-		Password:   password,
+		Password:   hashPassword,
 		Role:       "User",
 		ProfilePic: userInfo.Picture,
 	}
@@ -125,9 +133,33 @@ func RegisterWithPassword(c *fiber.Ctx) error {
 		})
 	}
 
+	if user.Name == "" || len(user.Name) < 2 {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "Name should be greater than 2 char",
+		})
+	}
+
+	validEmail, err := regexp.MatchString(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, user.Email)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error validating email",
+		})
+	}
+
+	if !validEmail {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid Email",
+		})
+	}
+
+	if len(user.Password) < 4 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Password should contain at least 4 characters",
+		})
+	}
+
 	db := database.DB
 
-	// TODO: Check user exist or not
 	userExist := db.Where("email = ?", user.Email).First(&model.User{})
 
 	if userExist.RowsAffected == 1 {
@@ -136,12 +168,19 @@ func RegisterWithPassword(c *fiber.Ctx) error {
 		})
 	}
 
+	password, err := utils.EncryptPassword(user.Password)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Internal server error",
+		})
+	}
+
 	createUser := model.User{
 		ID:       uuid.New(),
 		GoogleID: "",
 		Name:     user.Name,
 		Email:    user.Email,
-		Password: user.Password,
+		Password: password,
 		Role:     "User",
 	}
 
@@ -151,4 +190,9 @@ func RegisterWithPassword(c *fiber.Ctx) error {
 	}
 
 	return c.SendString("Login with password")
+}
+
+// TODO: create handler for manual login for users
+func LoginWithPassword(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
 }
