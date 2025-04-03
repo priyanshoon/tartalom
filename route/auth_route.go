@@ -14,4 +14,5 @@ func AuthRoutes(app *fiber.App) {
 	auth.Get("/login/google", handler.LoginWithGoole)
 	auth.Get("/google/callback", handler.LoginWithGooleCallback)
 	auth.Post("/register", handler.RegisterWithPassword)
+	auth.Post("/login", handler.LoginWithPassword)
 }

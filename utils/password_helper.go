@@ -34,4 +34,9 @@ func EncryptPassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func ValidatePassword() {}
+func ValidateHashPassword(hashPassword string, password string) bool {
+	if err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(password)); err != nil {
+		return false
+	}
+	return true
+}

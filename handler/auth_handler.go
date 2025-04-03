@@ -160,9 +160,16 @@ func RegisterWithPassword(c *fiber.Ctx) error {
 
 	db := database.DB
 
-	userExist := db.Where("email = ?", user.Email).First(&model.User{})
+	var userExist model.User
+	userFound := db.Where("email = ?", user.Email).First(&userExist)
 
-	if userExist.RowsAffected == 1 {
+	if userExist.GoogleID != "" {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"message": "Google account exist with the associating email id, please login with google.",
+		})
+	}
+
+	if userFound.RowsAffected == 1 {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
 			"error": "User already exist, go to login!",
 		})
@@ -198,5 +205,59 @@ func RegisterWithPassword(c *fiber.Ctx) error {
 
 // TODO: create handler for manual login for users
 func LoginWithPassword(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
+	user := new(model.User)
+
+	if err := c.BodyParser(user); err != nil {
+		return c.Status(503).JSON(fiber.Map{
+			"error": "Error fetching data: " + err.Error(),
+		})
+	}
+
+	validEmail, err := regexp.MatchString(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, user.Email)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error validating email",
+		})
+	}
+
+	if !validEmail {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid Email",
+		})
+	}
+
+	db := database.DB
+
+	var userExist model.User
+	userFound := db.Where("email = ?", user.Email).First(&userExist)
+
+	if userFound.RowsAffected == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "User does not exist",
+		})
+	}
+
+	if userExist.GoogleID != "" {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"message": "Google account exist with the associating email id, please login with google.",
+		})
+	}
+
+	validPass := utils.ValidateHashPassword(userExist.Password, user.Password)
+	if !validPass {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Invalid login credentials",
+		})
+	}
+
+	token, err := utils.GenerateJWT(userExist)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal server error: error generating tokens")
+	}
+
+	response := fiber.Map{
+		"token": token,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
 }
