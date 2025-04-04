@@ -13,6 +13,7 @@ import (
 // FIX : Post Blog
 func PostBlog(c *fiber.Ctx) error {
 	// log.Println("Raw body:", string(c.Body()))
+	user_id := c.Params("user_id")
 	blog := new(model.Blog)
 
 	if err := c.BodyParser(blog); err != nil {
@@ -23,6 +24,7 @@ func PostBlog(c *fiber.Ctx) error {
 
 	blog.Blog_ID = uuid.New()
 	blog.PublishedDate = time.Now()
+	blog.UserID = uuid.MustParse(user_id)
 
 	db := database.DB
 
