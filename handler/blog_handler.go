@@ -13,7 +13,7 @@ import (
 // FIX : Post Blog
 func PostBlog(c *fiber.Ctx) error {
 	// log.Println("Raw body:", string(c.Body()))
-	user_id := c.Params("user_id")
+	service_id := c.Params("service_id")
 	blog := new(model.Blog)
 
 	if err := c.BodyParser(blog); err != nil {
@@ -22,9 +22,9 @@ func PostBlog(c *fiber.Ctx) error {
 		})
 	}
 
-	blog.Blog_ID = uuid.New()
+	blog.ID = uuid.New()
 	blog.PublishedDate = time.Now()
-	blog.UserID = uuid.MustParse(user_id)
+	blog.ServiceID = uuid.MustParse(service_id)
 
 	db := database.DB
 
@@ -55,7 +55,7 @@ func DeleteBlog(c *fiber.Ctx) error {
 
 	db := database.DB
 
-	db.Delete(&model.Blog{}, blog.Blog_ID)
+	db.Delete(&model.Blog{}, blog.ID)
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": "Blog Deleted Successfully",
@@ -74,7 +74,7 @@ func UpdateBlog(c *fiber.Ctx) error {
 
 	db := database.DB
 
-	result := db.Model(&model.Blog{}).Where("blog_id = ?", blog.Blog_ID).Updates(&model.Blog{
+	result := db.Model(&model.Blog{}).Where("blog_id = ?", blog.ID).Updates(&model.Blog{
 		Title: blog.Title,
 		Body:  blog.Body,
 	})

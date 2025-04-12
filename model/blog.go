@@ -7,14 +7,16 @@ import (
 )
 
 type Service struct {
-	Service_ID uuid.UUID
-	Name       string
+	ID     uuid.UUID `gorm:"not null;primaryKey"`
+	Name   string    `gorm:"not null;unique" json:"name"`
+	UserID uuid.UUID `gorm:"not null;index;foreignKey:ID,references:users(ID)" json:"user_id"`
+	Blog   []Blog    `gorm:"foreignKey:ServiceID"`
 }
 
 type Blog struct {
-	Blog_ID       uuid.UUID `json:"blog_id"`
+	ID            uuid.UUID `gorm:"not null;primaryKey"`
 	Title         string    `gorm:"not null" json:"title"`
 	Body          string    `gorm:"not null" json:"body"`
-	UserID        uuid.UUID `gorm:"not null;index;foreignKey:ID,references:users(ID)" json:"user_id"`
+	ServiceID     uuid.UUID `gorm:"not null;index;foreignKey:ID,references:services(ID)" json:"service_id"`
 	PublishedDate time.Time
 }
