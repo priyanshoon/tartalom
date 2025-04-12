@@ -28,6 +28,7 @@ func ConnectDB() {
 
 	fmt.Println("Database connected successfully!")
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.User{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.Service{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.Blog{})
 	fmt.Println("Database Migrated")
 	DB = db
