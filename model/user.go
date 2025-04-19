@@ -12,4 +12,3 @@ type User struct {
 	ProfilePic string    `gorm:"default:https://github.com/shadcn.png;" json:"profpic"`
 	Service    []Service `gorm:"foreignKey:UserID"`
 }
-
